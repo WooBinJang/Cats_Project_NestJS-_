@@ -1,4 +1,3 @@
-import { HttpException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -21,5 +20,10 @@ export class CatsRepository {
 
   async create(cat: CatRequestDto): Promise<Cat> {
     return await this.catModel.create(cat);
+  }
+
+  async findCatByIdWithoutPassword(catId: string): Promise<Cat | null> {
+    const cat = await this.catModel.findById(catId).select('-password');
+    return cat;
   }
 }

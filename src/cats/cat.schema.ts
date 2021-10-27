@@ -1,30 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Document, SchemaOptions } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
 const options: SchemaOptions = {
-  //스키마 설정
-  timestamps: true, //타임스탬프
+  timestamps: true,
 };
 
 @Schema(options)
 export class Cat extends Document {
   @ApiProperty({
-    example: 'test@naver.com',
+    example: 'amamov@kakao.com',
     description: 'email',
     required: true,
   })
   @Prop({
-    required: true, //필수 입력
-    unique: true, // 유일한값
+    required: true,
+    unique: true,
   })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @ApiProperty({
-    example: 'test',
+    example: 'amamov',
     description: 'name',
     required: true,
   })
@@ -36,7 +35,7 @@ export class Cat extends Document {
   name: string;
 
   @ApiProperty({
-    example: 'test',
+    example: '23810',
     description: 'password',
     required: true,
   })
@@ -51,7 +50,7 @@ export class Cat extends Document {
   @IsString()
   imgUrl: string;
 
-  readonly readOnlyData: { id: string; email: string; name: string }; //가상 필드 제공 (password 와 같은 정보는 노출되지 않게)
+  readonly readOnlyData: { id: string; email: string; name: string };
 }
 
 export const CatSchema = SchemaFactory.createForClass(Cat);
