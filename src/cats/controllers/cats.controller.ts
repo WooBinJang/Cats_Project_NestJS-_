@@ -1,11 +1,13 @@
-import { JwtAuthGuard } from './../auth/jwt/jwt.guard';
-import { AuthService } from './../auth/auth.service';
-import { CatsService } from './cats.service';
+import { multerOptions } from '../../common/utils/multer.options';
+import { JwtAuthGuard } from '../../auth/jwt/jwt.guard';
+import { AuthService } from '../../auth/auth.service';
+import { CatsService } from '../services/cats.service';
 import {
   Body,
   Controller,
   Get,
   Post,
+  UploadedFiles,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -13,12 +15,13 @@ import {
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exception.filter';
 //import { PositiveIntPipe } from 'src/common/pipes/positiveInt.pipe';
 import { SuccessInterceptor } from 'src/common/interceptors/logging.interceptor';
-import { CatRequestDto } from './dto/cats.request.dto';
+import { CatRequestDto } from '../dto/cats.request.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ReadOnlyCatDto } from './dto/cat.dto';
+import { ReadOnlyCatDto } from '../dto/cat.dto';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
-import { Cat } from './cat.schema';
+import { Cat } from '../cat.schema';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('cats')
 @UseInterceptors(SuccessInterceptor)
@@ -59,8 +62,22 @@ export class CatsController {
   }
 
   @ApiOperation({ summary: '이미지 업로드' })
-  @Post('upload/cats')
-  uploadCatImg() {
-    return 'uploadCatImg';
+  @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
+  @UseGuards(JwtAuthGuard)
+  @Post('upload')
+  uploadCatImg(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @CurrentUser() cat: Cat,
+  ) {
+    console.log(files);
+    //return { image: `http://localhost:8000/media/cats${files[0].fieldname}` };
+    return this.catsService.uploadImg(cat, files);
+    // return 'uploadCatImg';
+  }
+
+  @ApiOperation({ summary: '모든 고양이 가져오기' })
+  @Get('all')
+  getAllCat() {
+    return this.catsService.getAllCat();
   }
 }
