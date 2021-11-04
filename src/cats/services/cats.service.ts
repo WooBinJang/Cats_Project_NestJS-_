@@ -8,10 +8,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CatsService {
-  constructor(private readonly CatsRepository: CatsRepository) {}
+  constructor(private readonly catsRepository: CatsRepository) {}
   async signUp(body: CatRequestDto) {
     const { email, name, password } = body;
-    const isCatExist = await this.CatsRepository.existsByEmail(email); // 중복확인 boolean
+    const isCatExist = await this.catsRepository.existsByEmail(email); // 중복확인 boolean
 
     if (isCatExist) {
       throw new UnauthorizedException('해당 이메일은 존재합니다.');
@@ -19,7 +19,7 @@ export class CatsService {
 
     const hashedPassword = await bcrypt.hash(password, 10); //비밀번호 암호화
 
-    const cat = await this.CatsRepository.create({
+    const cat = await this.catsRepository.create({
       email,
       name,
       password: hashedPassword,
@@ -30,7 +30,7 @@ export class CatsService {
   async uploadImg(cat: Cat, files: Express.Multer.File[]) {
     const fileName = `cats/${files[0].filename}`;
     console.log(fileName);
-    const newCat = await this.CatsRepository.findByIdAndUpdateImg(
+    const newCat = await this.catsRepository.findByIdAndUpdateImg(
       cat.id,
       fileName,
     );
@@ -38,7 +38,7 @@ export class CatsService {
     return newCat;
   }
   async getAllCat() {
-    const allCat = await this.CatsRepository.findAll();
+    const allCat = await this.catsRepository.findAll();
     const readOnlyCats = allCat.map((cat) => cat.readOnlyData);
     return readOnlyCats;
   }
